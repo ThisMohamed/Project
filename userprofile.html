@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile</title>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        :root {
+            --background: #f8f8f8;
+            --text: #333;
+            --card-bg: #fff;
+            --border: #eaeaea;
+            --icon-color: #666;
+        }
+
+        [dir="rtl"] .settings-left {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .fa-chevron-right {
+            transform: rotate(180deg);
+        }
+
+        .settings-item-language {
+            position: relative;
+            /* Added this */
+        }
+
+        .language-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+            width: 150px;
+            z-index: 1000;
+        }
+
+        .language-dropdown.show {
+            display: block;
+        }
+
+        .language-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .language-option:hover {
+            background-color: var(--background);
+        }
+
+        .language-check {
+            visibility: hidden;
+        }
+
+        .language-option.active .language-check {
+            visibility: visible;
+        }
+
+        .settings-item-language {
+            position: relative;
+        }
+
+        .dark-mode {
+            --background: #1a1a1a;
+            --text: #fff;
+            --card-bg: #2d2d2d;
+            --border: #404040;
+            --icon-color: #fff;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+            padding-bottom: 70px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .profile-card {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .profile-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            overflow: hidden;
+            border: 2px solid #ffa500;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-image img {
+            width: 300%;
+            height: 300%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .profile-role {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .profile-email {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        .settings-list {
+            list-style: none;
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .settings-left i {
+            color: var(--icon-color);
+            width: 20px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        [dir="rtl"] .slider:before {
+            left: auto;
+            right: 2px;
+        }
+
+        [dir="rtl"] input:checked+.slider:before {
+            transform: translateX(-26px);
+        }
+
+        input:checked+.slider {
+            background-color: #2196F3;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--card-bg);
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid var(--border);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-item {
+            text-align: center;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            color: var(--icon-color);
+            margin-bottom: 5px;
+        }
+
+        .nav-item.active {
+            color: #4CAF50;
+        }
+
+        .nav-item.active i {
+            color: #4CAF50;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .profile-card {
+                padding: 20px;
+            }
+
+            .profile-name {
+                font-size: 20px;
+            }
+
+            .profile-role {
+                font-size: 16px;
+            }
+
+            .profile-email {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="profile-card">
+            <div class="profile-image">
+                <img src="images/010.png" alt="University Logo">
+            </div>
+            <h1 class="profile-name" data-en="Mohamed Ahmed" data-ar="محمد أحمد">Mohamed Ahmed</h1>
+            <p class="profile-role" data-en="Student" data-ar="طالب">Student</p>
+            <p class="profile-email">m77md.107@gmail.com</p>
+        </div>
+
+        <div class="settings-list">
+            <div class="settings-item settings-item-language">
+                <div class="settings-left">
+                    <i class="fas fa-globe"></i>
+                    <span data-en="Language" data-ar="اللغة">Language</span>
+                </div>
+                <i class="fas fa-chevron-down"></i>
+
+                <!-- Language Dropdown -->
+                <div class="language-dropdown">
+                    <div class="language-option" data-lang="en">
+                        <i class="fas fa-check language-check en-check"></i>
+                        <span>English</span>
+                    </div>
+                    <div class="language-option" data-lang="ar">
+                        <i class="fas fa-check language-check ar-check"></i>
+                        <span>العربية</span>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-item">
+                <div class="settings-left">
+                    <i class="fas fa-moon"></i>
+                    <span data-en="Dark Mode" data-ar="الوضع الليلي">Dark Mode</span>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="darkModeToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="settings-item" id="logoutBtn">
+                <div class="settings-left">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span data-en="Logout" data-ar="تسجيل الخروج">Logout</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span data-en="Home" data-ar="الرئيسية">Home</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-book"></i>
+            <span data-en="My Courses" data-ar="دوراتي">My Courses</span>
+        </a>
+        <a href="#" class="nav-item active">
+            <i class="fas fa-user"></i>
+            <span data-en="Profile" data-ar="الملف الشخصي">Profile</span>
+        </a>
+    </nav>
+
+    <script>
+        // Language Switching Functionality
+        const languageBtn = document.querySelector('.settings-item-language');
+        const languageDropdown = document.querySelector('.language-dropdown');
+        const languageOptions = document.querySelectorAll('.language-option');
+        const translateElements = document.querySelectorAll('[data-en]');
+
+        // Show/Hide language dropdown
+        languageBtn.addEventListener('click', () => {
+            languageDropdown.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!languageBtn.contains(e.target)) {
+                languageDropdown.classList.remove('show');
+            }
+        });
+
+        // Language switching function
+        function switchLanguage(lang) {
+            document.documentElement.setAttribute('lang', lang);
+            document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+
+            // Update slider direction based on language
+            const sliders = document.querySelectorAll('.slider');
+            sliders.forEach(slider => {
+                if (lang === 'ar') {
+                    slider.style.direction = 'rtl';
+                } else {
+                    slider.style.direction = 'ltr';
+                }
+            });
+
+            translateElements.forEach(element => {
+                element.textContent = element.getAttribute(`data-${lang}`);
+            });
+
+            localStorage.setItem('preferredLanguage', lang);
+        }
+
+        // Language option click handlers
+        languageOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const lang = option.getAttribute('data-lang');
+                switchLanguage(lang);
+                languageDropdown.classList.remove('show');
+
+                // Update checkmarks
+                document.querySelectorAll('.language-check').forEach(check => {
+                    check.style.visibility = 'hidden';
+                });
+                option.querySelector('.language-check').style.visibility = 'visible';
+            });
+        });
+
+        // Dark mode functionality
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            darkModeToggle.checked = true;
+        }
+
+        darkModeToggle.addEventListener('change', () => {
+            if (darkModeToggle.checked) {
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            window.location.href = 'login.html'; // Change this to your login page URL
+        });
+
+        // Initialize language from localStorage
+        const savedLanguage = localStorage.getItem('preferredLanguage');
+        if (savedLanguage) {
+            switchLanguage(savedLanguage);
+            // Update checkmark
+            document.querySelector(`.${savedLanguage}-check`).style.visibility = 'visible';
+        } else {
+            // Set default checkmark for English
+            document.querySelector('.en-check').style.visibility = 'visible';
+            document.querySelector('.ar-check').style.visibility = 'hidden';
+        }
+    </script>
+</body>
+
+</html>
